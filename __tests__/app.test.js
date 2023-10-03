@@ -30,10 +30,10 @@ describe('GET /api/topics', () => {
               });
       });
       it('should respond not found for invalid endpoint', () => {
-        return request(app).get('/api/invalid-endpoint')
+        return request(app).get('/invalid-endpoint')
         .expect(404)
         .then((response) => {
-            expect(response.body.msg).toBe('Not Found')
+            expect(response.body.msg).toBe('Path not found')
         })
     });
   });
@@ -48,3 +48,31 @@ describe('GET /api/topics', () => {
     })
     });
 // test push
+describe('GET/api/articles/:article_id', () => {
+  it('GET:200 and should respond with an object containing correct article properties', () => {
+    return request(app)
+      .get('/api/articles/1')
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(typeof article).toBe('object')
+        expect (article.hasOwnProperty('author')).toBe(true);
+        expect (article.hasOwnProperty('title')).toBe(true);
+        expect (article.hasOwnProperty('article_id')).toBe(true);
+        expect (article.hasOwnProperty('body')).toBe(true);
+        expect (article.hasOwnProperty('topic')).toBe(true);
+        expect (article.hasOwnProperty('created_at')).toBe(true);
+        expect (article.hasOwnProperty('votes')).toBe(true);
+        expect (article.hasOwnProperty('article_img_url')).toBe(true);
+      });
+  });
+  it('should throw 404 error if given id doesnt exist', () => {
+    return request(app)
+    .get('/api/articles/1000')
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe('Path not found')
+  })
+  });
+});
+
