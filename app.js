@@ -1,9 +1,13 @@
 const express = require('express');
 const app = express();
-const { getTopics } = require('./controllers/controller'); 
+const { getTopics, getEndpoints } = require('./controllers/controller'); 
 
 
 app.get('/api/topics', getTopics); 
+
+app.get('/api', getEndpoints);
+
+
 
 app.use((req, res, next) => {
     const error = new Error("Not Found");
