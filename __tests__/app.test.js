@@ -38,7 +38,7 @@ describe('GET /api/topics', () => {
     });
   });
 
-  describe('/api', () => {
+  describe('GET/api', () => {
     it('should respond with an object describing all endpoints', () => {
         return request(app).get('/api')
           .expect(200).then((response) => {
