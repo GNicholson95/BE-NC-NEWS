@@ -28,10 +28,8 @@ exports.getCommentsByArticleId  = (req, res, next) => {
 		  })
 	}).catch(next)
   };
-  exports.getAllArticles = (req, res) => {
+  exports.getAllArticles = (req, res, next) => {
 	fetchArticles().then((articles) => {
 		res.status(200).send({ articles });
-	}).catch((err) => {
-        return err
-      })
+	}).catch(next)
 };
