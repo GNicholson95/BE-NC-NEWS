@@ -1,3 +1,4 @@
+
 const app = require('../app');
 const request = require("supertest");
 const db = require("../db/connection");
@@ -85,6 +86,78 @@ describe('GET/api/articles/:article_id', () => {
   })
   });
 });
+
+describe('GET/api/articles', () => {
+  it("gets all articles", () => {
+    return request(app).get("/api/articles").then((response) => {
+            expect(response.body.articles.length).toBe(13);
+         });
+     });
+  it('GET:200 and should respond with an articles array all article objects', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body;
+        expect(Array.isArray(articles)).toBe(true)
+        articles.forEach((article) => {
+          expect(article).toHaveProperty('author');
+          expect(typeof article.author).toBe('string');
+          expect(article).toHaveProperty('title');
+          expect(typeof article.title).toBe('string');
+          expect(article).toHaveProperty('article_id');
+          expect(typeof article.article_id).toBe('number');
+          expect(article).toHaveProperty('topic');
+          expect(typeof article.topic).toBe('string');
+          expect(article).toHaveProperty('created_at');
+          expect(typeof article.created_at).toBe('string');
+          expect(article).toHaveProperty('votes');
+          expect(typeof article.votes).toBe('number');
+          expect(article).toHaveProperty('article_img_url');
+          expect(typeof article.article_img_url).toBe('string');
+          expect(article).toHaveProperty('comment_count');
+          expect(typeof article.comment_count).toBe('string');
+          // updated test to for feedback on checking value types as well as checking keys exist
+            });
+      });
+      
+  });
+
+  it('should return the articles sorted by date in descending order.', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body;
+        expect(articles).toBeSortedBy('created_at',{
+          descending: true,
+        });
+      });
+  });
+
+  it('should return the articles without a body property present on any of the article objects.', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body;
+        expect(Array.isArray(articles)).toBe(true)
+        articles.forEach((article) => {
+          expect(article.hasOwnProperty('body')).toBe(false);
+            });
+      });
+  });
+  
+  it('should throw 404 error if given id doesnt exist', () => {
+    return request(app)
+    .get('/api/articles/1000')
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe('Resource not found')
+  })
+  });
+});
+
 
 describe('GET/api/articles/:article_id/comments', () => {
   it('GET:200 and should respond with an an array of comments for the given article_id', () => {
