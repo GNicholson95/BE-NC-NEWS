@@ -138,4 +138,14 @@ describe('GET/api/articles/:article_id/comments', () => {
       expect(response.body.msg).toBe('Resource not found')
   })
   });
+
+  it('should check exists but has no comments', () => {
+    return request(app)
+    .get('/api/articles/2/comments')
+    .expect(200)
+    .then((response) => {
+      const { comments } = response.body;
+      expect(comments).toEqual([])
+  })
+  });
 });
