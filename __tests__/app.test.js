@@ -111,15 +111,24 @@ describe('GET/api/articles', () => {
         const { articles } = response.body;
         expect(Array.isArray(articles)).toBe(true)
         articles.forEach((article) => {
-          expect (article.hasOwnProperty('author')).toBe(true);
-          expect (article.hasOwnProperty('title')).toBe(true);
-          expect (article.hasOwnProperty('article_id')).toBe(true);
-          expect (article.hasOwnProperty('topic')).toBe(true);
-          expect (article.hasOwnProperty('created_at')).toBe(true);
-          expect (article.hasOwnProperty('votes')).toBe(true);
-          expect (article.hasOwnProperty('article_img_url')).toBe(true);
-          expect (article.hasOwnProperty('comment_count')).toBe(true);
-          // unsure how to test for this
+          console.log(article);
+          expect(article).toHaveProperty('author');
+          expect(typeof article.author).toBe('string');
+          expect(article).toHaveProperty('title');
+          expect(typeof article.title).toBe('string');
+          expect(article).toHaveProperty('article_id');
+          expect(typeof article.article_id).toBe('number');
+          expect(article).toHaveProperty('topic');
+          expect(typeof article.topic).toBe('string');
+          expect(article).toHaveProperty('created_at');
+          expect(typeof article.created_at).toBe('string');
+          expect(article).toHaveProperty('votes');
+          expect(typeof article.votes).toBe('number');
+          expect(article).toHaveProperty('article_img_url');
+          expect(typeof article.article_img_url).toBe('string');
+          expect(article).toHaveProperty('comment_count');
+          expect(typeof article.comment_count).toBe('string');
+          // updated test to for feedback on checking value types as well as checking keys exist
             });
       });
       
