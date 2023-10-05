@@ -86,49 +86,57 @@ describe('GET/api/articles/:article_id', () => {
   });
 });
 
-
-
-// describe('GET/api/articles/:article_id/comments', () => {
-//   it('GET:200 and should respond with an an array of comments for the given article_id', () => {
-//     return request(app)
-//       .get('/api/articles/1/comments')
-//       .expect(200)
-//       .then((response) => {
-//         const { comments } = response.body;
-//         expect(comments.length).toBe(11);
-//         console.log(comments[0]);
-//         expect(comments[0]).toMatchObject({
-//           comment_id: 2,
-//           votes: 14,
-//           author: 'butter_bridge',
-//           body: 'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
-//           article_id: 1,
-//         })
-//         comments.forEach((comment) => {
-//           console.log(comment);
-//           expect (comment.hasOwnProperty('comment_id')).toBe(true);
-//           expect (comment.hasOwnProperty('votes')).toBe(true);
-//           expect (comment.hasOwnProperty('created_at')).toBe(true);
-//           expect (comment.hasOwnProperty('author')).toBe(true);
-//           expect (comment.hasOwnProperty('body')).toBe(true);
-//           expect (comment.hasOwnProperty('article_id')).toBe(true);
-//         });
-//       });
-//     });
-//   xit('should throw 400 error if given a bad request', () => {
-//     return request(app)
-//     .get('/api/articles/banana/comments')
-//     .expect(400)
-//     .then((response) => {
-//       expect(response.body.msg).toBe('Bad request')
-//   })
-//   });
-//   it('should throw 404 error if given id doesnt exist', () => {
-//     return request(app)
-//     .get('/api/articles/1000/comments')
-//     .expect(404)
-//     .then((response) => {
-//       expect(response.body.msg).toBe('Path not found')
-//   })
-//   });
-// });
+describe('GET/api/articles/:article_id/comments', () => {
+  it('GET:200 and should respond with an an array of comments for the given article_id', () => {
+    return request(app)
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then((response) => {
+        const { comments } = response.body;
+        console.log(comments);
+        expect(comments.length).toBe(11);
+        expect(comments[1]).toMatchObject({
+          comment_id: 2,
+          votes: 14,
+          author: 'butter_bridge',
+          body: 'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
+          article_id: 1,
+        })
+        comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe('number');
+          expect(typeof comment.votes).toBe('number');
+          expect(typeof comment.created_at).toBe('string');
+          expect(typeof comment.author).toBe('string');
+          expect(typeof comment.body).toBe('string');
+          expect(typeof comment.article_id).toBe('number');
+        });
+      });
+    });
+    it('should return the comments sorted by date in descending order.', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then((response) => {
+          const { comments } = response.body;
+          expect(comments).toBeSortedBy('created_at',{
+            descending: true,
+          });
+        });
+    });
+  it('should throw 400 error if given a bad request', () => {
+    return request(app)
+    .get('/api/articles/banana/comments')
+    .expect(400)
+    .then((response) => {
+      expect(response.body.msg).toBe('Bad request')
+  })
+  });
+  it('should throw 404 error if given id doesnt exist', () => {
+    return request(app)
+    .get('/api/articles/1000/comments')
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe('Path not found')
+  })
+  });
+});
