@@ -47,7 +47,7 @@ describe('GET /api/topics', () => {
         })
     })
     });
-// test push
+
 describe('GET/api/articles/:article_id', () => {
   it('GET:200 and should respond with an object containing correct article properties', () => {
     return request(app)
@@ -55,16 +55,36 @@ describe('GET/api/articles/:article_id', () => {
       .expect(200)
       .then((response) => {
         const { article } = response.body;
-        expect(typeof article).toBe('object')
-        expect (article.hasOwnProperty('author')).toBe(true);
-        expect (article.hasOwnProperty('title')).toBe(true);
-        expect (article.hasOwnProperty('article_id')).toBe(true);
-        expect (article.hasOwnProperty('body')).toBe(true);
-        expect (article.hasOwnProperty('topic')).toBe(true);
-        expect (article.hasOwnProperty('created_at')).toBe(true);
-        expect (article.hasOwnProperty('votes')).toBe(true);
-        expect (article.hasOwnProperty('article_img_url')).toBe(true);
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: 'Living in the shadow of a great man',
+          topic: 'mitch',
+          author: 'butter_bridge',
+          body: 'I find this existence challenging',
+          created_at: '2020-07-09T20:11:00.000Z',
+          votes: 100,
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+        })
+        
+        // expect(typeof article).toBe('object')
+        // expect (article.article_id).toBe(1);
+        // expect (article.hasOwnProperty('author')).toBe(true);
+        // expect (article.hasOwnProperty('title')).toBe(true);
+        // expect (article.hasOwnProperty('article_id')).toBe(true);
+        // expect (article.hasOwnProperty('body')).toBe(true);
+        // expect (article.hasOwnProperty('topic')).toBe(true);
+        // expect (article.hasOwnProperty('created_at')).toBe(true);
+        // expect (article.hasOwnProperty('votes')).toBe(true);
+        // expect (article.hasOwnProperty('article_img_url')).toBe(true);
       });
+    });
+  it('should throw 400 error if given a bad request', () => {
+    return request(app)
+    .get('/api/articles/banana')
+    .expect(400)
+    .then((response) => {
+      expect(response.body.msg).toBe('Bad request')
+  })
   });
   it('should throw 404 error if given id doesnt exist', () => {
     return request(app)
@@ -74,5 +94,68 @@ describe('GET/api/articles/:article_id', () => {
       expect(response.body.msg).toBe('Path not found')
   })
   });
+  
 });
 
+describe('GET/api/articles', () => {
+  it("gets all articles", () => {
+    return request(app).get("/api/articles").then((response) => {
+            expect(response.body.articles.length).toBe(13);
+         });
+     });
+  it('GET:200 and should respond with an articles array all article objects', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body;
+        expect(Array.isArray(articles)).toBe(true)
+        articles.forEach((article) => {
+          expect (article.hasOwnProperty('author')).toBe(true);
+          expect (article.hasOwnProperty('title')).toBe(true);
+          expect (article.hasOwnProperty('article_id')).toBe(true);
+          expect (article.hasOwnProperty('topic')).toBe(true);
+          expect (article.hasOwnProperty('created_at')).toBe(true);
+          expect (article.hasOwnProperty('votes')).toBe(true);
+          expect (article.hasOwnProperty('article_img_url')).toBe(true);
+          expect (article.hasOwnProperty('comment_count')).toBe(true);
+          // unsure how to test for this
+            });
+      });
+      
+  });
+
+  it('should return the articles sorted by date in descending order.', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body;
+        expect(articles).toBeSortedBy('created_at',{
+          descending: true,
+        });
+      });
+  });
+
+  it('should return the articles without a body property present on any of the article objects.', () => {
+    return request(app)
+      .get('/api/articles')
+      .expect(200)
+      .then((response) => {
+        const { articles } = response.body;
+        expect(Array.isArray(articles)).toBe(true)
+        articles.forEach((article) => {
+          expect(article.hasOwnProperty('body')).toBe(false);
+            });
+      });
+  });
+  
+  it('should throw 404 error if given id doesnt exist', () => {
+    return request(app)
+    .get('/api/articles/1000')
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe('Path not found')
+  })
+  });
+});
