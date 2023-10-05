@@ -16,14 +16,14 @@ app.all("/*", (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-    console.log(err);
-    if (err.status === 400) {
-      res.status(400).send({msg:'Bad request'});
-    }else if(err.code === '22P02'){
-      res.status(400).send({msg:'Bad request'})
-    }else if(err.status === 404){
-        res.status(404).send({msg:'Path not found'})
-    }else{
+  if (err.status === 400) {
+    res.status(400).send({msg:'Bad request'});
+  }else if(err.code === '22P02'){
+    res.status(400).send({msg:'Bad request'})
+  }else if(err.status === 404){
+    res.status(404).send({msg:'Resource not found'})
+  }else{
+      console.log(err);
         res.status (500). send ({ msg: 'internal server error!' });
     }
   });

@@ -81,7 +81,7 @@ describe('GET/api/articles/:article_id', () => {
     .get('/api/articles/1000')
     .expect(404)
     .then((response) => {
-      expect(response.body.msg).toBe('Path not found')
+      expect(response.body.msg).toBe('Resource not found')
   })
   });
 });
@@ -93,7 +93,6 @@ describe('GET/api/articles/:article_id/comments', () => {
       .expect(200)
       .then((response) => {
         const { comments } = response.body;
-        console.log(comments);
         expect(comments.length).toBe(11);
         expect(comments[1]).toMatchObject({
           comment_id: 2,
@@ -136,7 +135,7 @@ describe('GET/api/articles/:article_id/comments', () => {
     .get('/api/articles/1000/comments')
     .expect(404)
     .then((response) => {
-      expect(response.body.msg).toBe('Path not found')
+      expect(response.body.msg).toBe('Resource not found')
   })
   });
 });
