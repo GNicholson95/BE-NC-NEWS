@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { getTopics, getEndpoints, getArticleById, getAllArticles, getCommentsByArticleId} = require('./controllers/controller'); 
+const { getTopics, getEndpoints, getArticleById, getAllArticles} = require('./controllers/controller'); 
 
 
 app.get('/api/topics', getTopics); 
@@ -11,7 +11,7 @@ app.get('/api/articles/:article_id', getArticleById);
 
 app.get('/api/articles', getAllArticles);
 
-app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
+
 
 app.use((err, req, res, next) => {
     if (err.status === 400) {

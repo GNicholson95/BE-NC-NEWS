@@ -1,4 +1,4 @@
-const { fetchTopics, selectArticleById, fetchArticles, selectCommentsByArticleId} = require('../models/model')
+const { fetchTopics, selectArticleById, fetchArticles, } = require('../models/model')
 const endpoints = require('../endpoints.json')
 
 exports.getTopics = (req, res) => {
@@ -29,13 +29,3 @@ exports.getArticleById = (req, res, next) => {
         return err
       })
 };
-
-exports.getCommentsByArticleId  = (req, res, next) => {
-	const { article_id } = req.params;
-	selectCommentsByArticleId(article_id).then((comments) => {
-	  res.status(200).send({ comments });
-	}).catch((err) => {
-        return err
-      })
-  };
-
