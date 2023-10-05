@@ -4,6 +4,7 @@ const ENV = process.env.NODE_ENV || 'development';
 const config = {};
 
 if (ENV === 'production') {
+  console.log('production');
   config.connectionString = process.env.DATABASE_URL;
   config.max = 2;
 }
@@ -17,4 +18,3 @@ if (!process.env.PGDATABASE && !process.env.DATABASE_URL) {
 }
 
 module.exports = new Pool(config);
-// module.exports = new Pool();
