@@ -111,7 +111,6 @@ describe('GET/api/articles', () => {
         const { articles } = response.body;
         expect(Array.isArray(articles)).toBe(true)
         articles.forEach((article) => {
-          console.log(article);
           expect(article).toHaveProperty('author');
           expect(typeof article.author).toBe('string');
           expect(article).toHaveProperty('title');
