@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { getTopics, getEndpoints, getArticleById } = require('./controllers/controller'); 
+const { getTopics, getEndpoints, getArticleById, getCommentsByArticleId } = require('./controllers/controller'); 
 
 
 app.get('/api/topics', getTopics); 
@@ -9,16 +9,18 @@ app.get('/api', getEndpoints);
 
 app.get('/api/articles/:article_id', getArticleById);
 
-// app.use((req, res, next) => {
-//     const error = new Error("Not Found");
-//     error.status = 404;
-//     next(error);
-// });
+app.get('/api/articles/1/comments', getCommentsByArticleId);
+
+app.all("/*", (req, res, next) => {
+  res.status(404).send({ msg: "Path not found" });
+});
 
 app.use((err, req, res, next) => {
     console.log(err);
     if (err.status === 400) {
       res.status(400).send({msg:'Bad request'});
+    }else if(err.code === '22P02'){
+      res.status(400).send({msg:'Bad request'})
     }else if(err.status === 404){
         res.status(404).send({msg:'Path not found'})
     }else{
@@ -26,8 +28,6 @@ app.use((err, req, res, next) => {
     }
   });
 
-app.all("/*", (req, res, next) => {
-    res.status(404).send({ msg: "Path not found" });
-});
+
 
 module.exports = app;

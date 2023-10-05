@@ -3,7 +3,8 @@ const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require('../db/data/test-data/index')
-const endpoints = require('../endpoints.json')
+const endpoints = require('../endpoints.json');
+const { string } = require('pg-format');
 
 beforeEach(() => {
 	return seed(data);
@@ -47,7 +48,7 @@ describe('GET /api/topics', () => {
         })
     })
     });
-// test push
+
 describe('GET/api/articles/:article_id', () => {
   it('GET:200 and should respond with an object containing correct article properties', () => {
     return request(app)
@@ -55,16 +56,25 @@ describe('GET/api/articles/:article_id', () => {
       .expect(200)
       .then((response) => {
         const { article } = response.body;
-        expect(typeof article).toBe('object')
-        expect (article.hasOwnProperty('author')).toBe(true);
-        expect (article.hasOwnProperty('title')).toBe(true);
-        expect (article.hasOwnProperty('article_id')).toBe(true);
-        expect (article.hasOwnProperty('body')).toBe(true);
-        expect (article.hasOwnProperty('topic')).toBe(true);
-        expect (article.hasOwnProperty('created_at')).toBe(true);
-        expect (article.hasOwnProperty('votes')).toBe(true);
-        expect (article.hasOwnProperty('article_img_url')).toBe(true);
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: 'Living in the shadow of a great man',
+          topic: 'mitch',
+          author: 'butter_bridge',
+          body: 'I find this existence challenging',
+          created_at: '2020-07-09T20:11:00.000Z',
+          votes: 100,
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
+        })
       });
+    });
+  it('should throw 400 error if given a bad request', () => {
+    return request(app)
+    .get('/api/articles/banana')
+    .expect(400)
+    .then((response) => {
+      expect(response.body.msg).toBe('Bad request')
+  })
   });
   it('should throw 404 error if given id doesnt exist', () => {
     return request(app)
@@ -76,3 +86,49 @@ describe('GET/api/articles/:article_id', () => {
   });
 });
 
+
+
+// describe('GET/api/articles/:article_id/comments', () => {
+//   it('GET:200 and should respond with an an array of comments for the given article_id', () => {
+//     return request(app)
+//       .get('/api/articles/1/comments')
+//       .expect(200)
+//       .then((response) => {
+//         const { comments } = response.body;
+//         expect(comments.length).toBe(11);
+//         console.log(comments[0]);
+//         expect(comments[0]).toMatchObject({
+//           comment_id: 2,
+//           votes: 14,
+//           author: 'butter_bridge',
+//           body: 'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
+//           article_id: 1,
+//         })
+//         comments.forEach((comment) => {
+//           console.log(comment);
+//           expect (comment.hasOwnProperty('comment_id')).toBe(true);
+//           expect (comment.hasOwnProperty('votes')).toBe(true);
+//           expect (comment.hasOwnProperty('created_at')).toBe(true);
+//           expect (comment.hasOwnProperty('author')).toBe(true);
+//           expect (comment.hasOwnProperty('body')).toBe(true);
+//           expect (comment.hasOwnProperty('article_id')).toBe(true);
+//         });
+//       });
+//     });
+//   xit('should throw 400 error if given a bad request', () => {
+//     return request(app)
+//     .get('/api/articles/banana/comments')
+//     .expect(400)
+//     .then((response) => {
+//       expect(response.body.msg).toBe('Bad request')
+//   })
+//   });
+//   it('should throw 404 error if given id doesnt exist', () => {
+//     return request(app)
+//     .get('/api/articles/1000/comments')
+//     .expect(404)
+//     .then((response) => {
+//       expect(response.body.msg).toBe('Path not found')
+//   })
+//   });
+// });
