@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
-const { getTopics, getEndpoints, getArticleById, getAllArticles, getCommentsByArticleId, getAllUsers} = require('./controllers/controller'); 
 
+const { getTopics, getEndpoints, getArticleById, getAllArticles, getCommentsByArticleId, postComment, getAllUsers} = require('./controllers/controller'); 
+
+app.use(express.json());
 
 app.get('/api/topics', getTopics); 
 
@@ -15,6 +17,9 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 
 app.get('/api/users', getAllUsers);
 
+app.post('/api/articles/:article_id/comments', postComment);
+
+
 app.all("/*", (req, res, next) => {
   res.status(404).send({ msg: "Path not found" });
 });
@@ -24,7 +29,10 @@ app.use((err, req, res, next) => {
     res.status(400).send({msg:'Bad request'});
   }else if(err.code === '22P02'){
     res.status(400).send({msg:'Bad request'})
-  }else if(err.status === 404){
+   }else if(err.code === '23503'){
+     res.status(404).send({msg:'Resource not found'})
+   }
+  else if(err.status === 404){
     res.status(404).send({msg:'Resource not found'})
   }else{
       console.log(err);

@@ -212,6 +212,7 @@ describe('GET/api/articles/:article_id/comments', () => {
   });
 });
 
+
 describe('GET/api/users', () => {
      it("get all users", () => {
       return request(app).get("/api/users").then((response) => {
@@ -240,3 +241,83 @@ describe('GET/api/users', () => {
     })
 });
 });
+describe('POST /api/articles/:article_id/comments', () => {
+
+  it('should return 201 and add a comment for an article.', () => {
+    const comment = {
+      username: 'butter_bridge',
+      body: 'My comments'
+    }
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(comment)
+      .expect(201)
+      .then((response) => {
+          expect(response.body.comment).toMatchObject({
+           author: 'butter_bridge',
+           body: 'My comments',
+          })
+        expect(typeof response.body.comment.comment_id).toBe('number');
+        expect(typeof response.body.comment.votes).toBe('number');
+        expect(typeof response.body.comment.created_at).toBe('string');
+        expect(typeof response.body.comment.author).toBe('string');
+        expect(typeof response.body.comment.body).toBe('string');
+        expect(typeof response.body.comment.article_id).toBe('number');
+      });
+  });
+
+it('POST:400 error if not given a comment', () => {
+  const comment = {}
+  return request(app)
+    .post('/api/articles/banana/comments')
+    .send(comment)
+    .expect(400)
+    .then((response) => {
+    expect(response.body.msg).toBe('Bad request')
+})
+})
+
+it('should throw 404 error if article not found', () => {
+  const comment = {
+    username: 'no_user',
+    body: 'My comments'
+  }
+  return request(app)
+  .post('/api/articles/1000/comments')
+  .send(comment)
+  .expect(404)
+  .then((response) => {
+      expect(response.body.msg).toBe('Resource not found')
+   })
+})
+
+it('POST:400 error if given an invalid article id', () => {
+  const comment = {
+    username: 'butter_bridge',
+    body: 'My comment'
+  }
+  return request(app)
+    .post('/api/articles/banana/comments')
+    .send(comment)
+    .expect(400)
+    .then((response) => {
+    expect(response.body.msg).toBe('Bad request')
+})
+})
+
+it('should throw 404 error if username doesnt exist (PSQL err)', () => {
+  const comment = {
+    username: 'no_user',
+    body: 'My comments'
+  }
+  return request(app)
+  .post('/api/articles/1/comments')
+  .send(comment)
+  .expect(404)
+  .then((response) => {
+      expect(response.body.msg).toBe('Resource not found')
+   })
+})
+
+})
+
