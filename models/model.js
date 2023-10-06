@@ -1,7 +1,8 @@
 const db = require("../db/connection");
 
 exports.fetchTopics = () => {
-	return db.query("SELECT * FROM topics;").then(({ rows }) => {
+	return db.query("SELECT * FROM topics;")
+	.then(({ rows }) => {
 		return rows;
 	})
 };
@@ -32,6 +33,20 @@ exports.selectArticleById = (article_id) => {
 		return result.rows;
 	  });
   };
+
+  exports.fetchArticles = () => {
+	return db.query(`SELECT articles.article_id,title,topic,articles.author,articles.created_at,articles.votes,article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY created_at DESC;
+	`).then(({ rows }) => {
+		return rows;
+	})
+};
+
+exports.fetchUsers = () => {
+	return db.query("SELECT * FROM users;")
+	.then(({ rows }) => {
+		return rows;
+	})
+};
   
 exports.insertComment = (article_id, username, body ) => {
 	return db
