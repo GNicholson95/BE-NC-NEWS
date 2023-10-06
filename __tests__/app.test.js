@@ -224,7 +224,6 @@ describe('POST /api/articles/:article_id/comments', () => {
       .send(comment)
       .expect(201)
       .then((response) => {
-        console.log(response.body);
           expect(response.body).toMatchObject({
            author: 'butter_bridge',
            body: 'My comments',

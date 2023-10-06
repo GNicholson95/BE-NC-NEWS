@@ -40,7 +40,6 @@ exports.postComment = (req, res, next) => {
 	const { article_id } = req.params;
 	// gets user name and body 
 	const { username, body } = req.body;
-	
 	insertComment(article_id, username, body).then((result) => {
 	  res.status(201).send(result);
 	}).catch(next)

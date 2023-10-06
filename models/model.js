@@ -34,7 +34,6 @@ exports.selectArticleById = (article_id) => {
   };
   
 exports.insertComment = (article_id, username, body ) => {
-	console.log(body);
 	return db
 	  .query(
 		'INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;',
