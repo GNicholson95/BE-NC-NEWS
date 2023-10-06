@@ -211,3 +211,32 @@ describe('GET/api/articles/:article_id/comments', () => {
   })
   });
 });
+
+describe('GET/api/users', () => {
+     it("get all users", () => {
+      return request(app).get("/api/users").then((response) => {
+              expect(response.body.users.length).toBe(4);
+           });
+       });
+  it('GET:200 and should respond with an users array all user objects', () => {
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then((response) => {
+        const { users } = response.body;
+        users.forEach((user) => {
+          expect(typeof user.username).toBe('string');
+          expect(typeof user.name).toBe('string');
+          expect(typeof user.avatar_url).toBe('string');
+            });
+      });
+  });
+
+  it('should respond not found for invalid endpoint', () => {
+    return request(app).get('/invalid-endpoint')
+    .expect(404)
+    .then((response) => {
+        expect(response.body.msg).toBe('Path not found')
+    })
+});
+});
