@@ -1,10 +1,10 @@
+
 const app = require('../app');
 const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require('../db/data/test-data/index')
 const endpoints = require('../endpoints.json');
-const { string } = require('pg-format');
 
 beforeEach(() => {
 	return seed(data);
@@ -66,17 +66,6 @@ describe('GET/api/articles/:article_id', () => {
           votes: 100,
           article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'
         })
-        
-        // expect(typeof article).toBe('object')
-        // expect (article.article_id).toBe(1);
-        // expect (article.hasOwnProperty('author')).toBe(true);
-        // expect (article.hasOwnProperty('title')).toBe(true);
-        // expect (article.hasOwnProperty('article_id')).toBe(true);
-        // expect (article.hasOwnProperty('body')).toBe(true);
-        // expect (article.hasOwnProperty('topic')).toBe(true);
-        // expect (article.hasOwnProperty('created_at')).toBe(true);
-        // expect (article.hasOwnProperty('votes')).toBe(true);
-        // expect (article.hasOwnProperty('article_img_url')).toBe(true);
       });
     });
   it('should throw 400 error if given a bad request', () => {
@@ -92,7 +81,7 @@ describe('GET/api/articles/:article_id', () => {
     .get('/api/articles/1000')
     .expect(404)
     .then((response) => {
-      expect(response.body.msg).toBe('Path not found')
+      expect(response.body.msg).toBe('Resource not found')
   })
   });
 });
@@ -109,25 +98,15 @@ describe('GET/api/articles', () => {
       .expect(200)
       .then((response) => {
         const { articles } = response.body;
-        expect(Array.isArray(articles)).toBe(true)
         articles.forEach((article) => {
-          expect(article).toHaveProperty('author');
           expect(typeof article.author).toBe('string');
-          expect(article).toHaveProperty('title');
           expect(typeof article.title).toBe('string');
-          expect(article).toHaveProperty('article_id');
           expect(typeof article.article_id).toBe('number');
-          expect(article).toHaveProperty('topic');
           expect(typeof article.topic).toBe('string');
-          expect(article).toHaveProperty('created_at');
           expect(typeof article.created_at).toBe('string');
-          expect(article).toHaveProperty('votes');
           expect(typeof article.votes).toBe('number');
-          expect(article).toHaveProperty('article_img_url');
           expect(typeof article.article_img_url).toBe('string');
-          expect(article).toHaveProperty('comment_count');
           expect(typeof article.comment_count).toBe('string');
-          // updated test to for feedback on checking value types as well as checking keys exist
             });
       });
       
@@ -163,7 +142,72 @@ describe('GET/api/articles', () => {
     .get('/api/articles/1000')
     .expect(404)
     .then((response) => {
-      expect(response.body.msg).toBe('Path not found')
+      expect(response.body.msg).toBe('Resource not found')
+  })
+  });
+});
+
+
+describe('GET/api/articles/:article_id/comments', () => {
+  it('GET:200 and should respond with an an array of comments for the given article_id', () => {
+    return request(app)
+      .get('/api/articles/1/comments')
+      .expect(200)
+      .then((response) => {
+        const { comments } = response.body;
+        expect(comments.length).toBe(11);
+        expect(comments[1]).toMatchObject({
+          comment_id: 2,
+          votes: 14,
+          author: 'butter_bridge',
+          body: 'The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.',
+          article_id: 1,
+        })
+        comments.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe('number');
+          expect(typeof comment.votes).toBe('number');
+          expect(typeof comment.created_at).toBe('string');
+          expect(typeof comment.author).toBe('string');
+          expect(typeof comment.body).toBe('string');
+          expect(typeof comment.article_id).toBe('number');
+        });
+      });
+    });
+    it('should return the comments sorted by date in descending order.', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then((response) => {
+          const { comments } = response.body;
+          expect(comments).toBeSortedBy('created_at',{
+            descending: true,
+          });
+        });
+    });
+  it('should throw 400 error if given a bad request', () => {
+    return request(app)
+    .get('/api/articles/banana/comments')
+    .expect(400)
+    .then((response) => {
+      expect(response.body.msg).toBe('Bad request')
+  })
+  });
+  it('should throw 404 error if given id doesnt exist', () => {
+    return request(app)
+    .get('/api/articles/1000/comments')
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe('Resource not found')
+  })
+  });
+
+  it('should check exists but has no comments', () => {
+    return request(app)
+    .get('/api/articles/2/comments')
+    .expect(200)
+    .then((response) => {
+      const { comments } = response.body;
+      expect(comments).toEqual([])
   })
   });
 });
