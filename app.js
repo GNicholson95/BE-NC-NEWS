@@ -25,7 +25,10 @@ app.use((err, req, res, next) => {
     res.status(400).send({msg:'Bad request'});
   }else if(err.code === '22P02'){
     res.status(400).send({msg:'Bad request'})
-  }else if(err.status === 404){
+   }else if(err.code === '23503'){
+     res.status(404).send({msg:'Resource not found'})
+   }
+  else if(err.status === 404){
     res.status(404).send({msg:'Resource not found'})
   }else{
       console.log(err);

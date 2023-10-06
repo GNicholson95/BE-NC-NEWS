@@ -41,6 +41,7 @@ exports.postComment = (req, res, next) => {
 	// gets user name and body 
 	const { username, body } = req.body;
 	insertComment(article_id, username, body).then((result) => {
-	  res.status(201).send(result);
+		res.status(201).send({comment : result});
+	//   res.status(201).send(result);
 	}).catch(next)
   };
