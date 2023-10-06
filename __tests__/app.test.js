@@ -211,3 +211,42 @@ describe('GET/api/articles/:article_id/comments', () => {
   })
   });
 });
+
+describe('POST /api/articles/:article_id/comments', () => {
+
+  it('should return 201 and add a comment for an article.', () => {
+    const comment = {
+      username: 'butter_bridge',
+      body: 'My comments'
+    }
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(comment)
+      .expect(201)
+      .then((response) => {
+        console.log(response.body);
+          expect(response.body).toMatchObject({
+           author: 'butter_bridge',
+           body: 'My comments',
+          })
+        expect(typeof response.body.comment_id).toBe('number');
+        expect(typeof response.body.votes).toBe('number');
+        expect(typeof response.body.created_at).toBe('string');
+        expect(typeof response.body.author).toBe('string');
+        expect(typeof response.body.body).toBe('string');
+        expect(typeof response.body.article_id).toBe('number');
+      });
+  });
+
+it('POST:400 error if not given a comment', () => {
+  const comment = {}
+  return request(app)
+    .post('/api/articles/banana/comments')
+    .send(comment)
+    .expect(400)
+    .then((response) => {
+    expect(response.body.msg).toBe('Bad request')
+})
+})
+
+})
