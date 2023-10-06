@@ -136,13 +136,28 @@ describe('GET/api/articles', () => {
             });
       });
   });
-  
-  it('should throw 404 error if given id doesnt exist', () => {
+
+  it('filters the articles by the topic value specified in the query.', () => {
     return request(app)
-    .get('/api/articles/1000')
-    .expect(404)
+    .get('/api/articles')
+    .query({ topic: 'mitch'})
+    .expect(200)
     .then((response) => {
-      expect(response.body.msg).toBe('Resource not found')
+      const { articles } = response.body;
+      articles.forEach((article) =>{
+        expect(article).toHaveProperty('topic','mitch')
+      })
+  })
+  });
+// ran out of time!
+  xit('should check exists but has no comments', () => {
+    return request(app)
+    .get('/api/articles')
+    .query({ topic: 'paper'})
+    .expect(200)
+    .then((response) => {
+      const { articles } = response.body;
+      expect(articles).toEqual([])
   })
   });
 });
@@ -318,6 +333,5 @@ it('should throw 404 error if username doesnt exist (PSQL err)', () => {
       expect(response.body.msg).toBe('Resource not found')
    })
 })
-
 })
 

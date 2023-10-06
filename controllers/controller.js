@@ -22,7 +22,9 @@ exports.getArticleById = (req, res, next) => {
   };
 
   exports.getAllArticles = (req, res, next) => {
-	fetchArticles().then((articles) => {
+	const { topic } = req.query;
+	console.log(topic);
+	fetchArticles(topic).then((articles) => {
 		res.status(200).send({ articles });
 	}).catch(next)
 };
@@ -36,11 +38,6 @@ exports.getCommentsByArticleId  = (req, res, next) => {
 	}).catch(next)
   };
 
-  exports.getAllArticles = (req, res, next) => {
-	fetchArticles().then((articles) => {
-		res.status(200).send({ articles });
-	}).catch(next)
-};
 
 exports.getAllUsers = (req, res, next) => {
 	fetchUsers().then((users) => {
@@ -55,7 +52,6 @@ exports.postComment = (req, res, next) => {
 	const { username, body } = req.body;
 	insertComment(article_id, username, body).then((result) => {
 		res.status(201).send({comment : result});
-	//   res.status(201).send(result);
 	}).catch(next)
   };
 
