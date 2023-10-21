@@ -1,4 +1,4 @@
-const { fetchTopics, selectArticleById, fetchArticles, selectCommentsByArticleId, insertComment, fetchUsers} = require('../models/model')
+const { fetchTopics, selectArticleById, fetchArticles, selectCommentsByArticleId, insertComment, fetchUsers, deleteCommentById} = require('../models/model')
 
 const endpoints = require('../endpoints.json')
 
@@ -59,3 +59,11 @@ exports.postComment = (req, res, next) => {
 	}).catch(next)
   };
 
+
+  exports.deleteComment = (req, res, next) =>{
+	const { comment_id } = req.params
+	deleteCommentById(comment_id)
+	.then(()=>{
+		res.status(204).send();
+	}).catch(next)
+  }
