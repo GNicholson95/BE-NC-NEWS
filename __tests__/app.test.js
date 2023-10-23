@@ -353,3 +353,43 @@ describe('DELETE/api/comments/:comment_id', () => {
     })
   });
 });
+
+describe('Patch /api/articles/:article_id', () => {
+  it('retuns a article with incremented votes', () => {
+    const newVote = { inc_votes: 1 }; 
+    return request(app)
+      .patch('/api/articles/3')
+      .send(newVote)
+      .expect(201)
+      .then((response) => {
+        console.log(response.body);
+        expect(response.body).toHaveProperty('votes')
+        expect(response.body.votes).toBe(1)
+      });
+  });
+
+  it('retuns a article with decremented votes', () => {
+    const newVote = { inc_votes: -100 }; 
+    return request(app)
+      .patch('/api/articles/3')
+      .send(newVote)
+      .expect(201)
+      .then((response) => {
+        console.log(response.body);
+        expect(response.body).toHaveProperty('votes')
+        expect(response.body.votes).toBe(-100)
+      });
+  });
+
+  it('responds with a 400 error for an invalid inc_votes value', () => {
+    const newVote = { inc_votes: 'carrot' };
+    return request(app)
+      .patch('/api/articles/3')
+      .send(newVote)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('Bad request');
+      });
+  });
+
+});

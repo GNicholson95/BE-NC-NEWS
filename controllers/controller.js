@@ -1,4 +1,5 @@
-const { fetchTopics, selectArticleById, fetchArticles, selectCommentsByArticleId, insertComment, fetchUsers, deleteCommentById} = require('../models/model')
+
+const { fetchTopics, selectArticleById, fetchArticles, selectCommentsByArticleId, insertComment, fetchUsers, deleteCommentById, updateArticles} = require('../models/model')
 
 const endpoints = require('../endpoints.json')
 
@@ -45,6 +46,7 @@ exports.getAllUsers = (req, res, next) => {
 	}).catch(next)
 };
 
+
 exports.postComment = (req, res, next) => {
 	// gets url
 	const { article_id } = req.params;
@@ -63,3 +65,12 @@ exports.postComment = (req, res, next) => {
 		res.status(204).send();
 	}).catch(next)
   }
+  
+  exports.patchArticleById = (req, res, next) =>{
+	const { article_id } = req.params
+	const newVotes = req.body.inc_votes;
+	updateArticles(newVotes, article_id)
+	.then((result)=>{
+		res.status(201).send(result)
+	}).catch(next)
+}

@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const { getTopics, getEndpoints, getArticleById, getAllArticles, getCommentsByArticleId, postComment, getAllUsers, deleteComment} = require('./controllers/controller'); 
+const { getTopics, getEndpoints, getArticleById, getAllArticles, getCommentsByArticleId, postComment, getAllUsers, deleteComment, patchArticleById} = require('./controllers/controller'); 
 
 app.use(express.json());
 
@@ -20,6 +20,8 @@ app.get('/api/users', getAllUsers);
 app.post('/api/articles/:article_id/comments', postComment);
 
 app.delete('/api/comments/:comment_id', deleteComment)
+
+app.patch('/api/articles/:article_id', patchArticleById)
 
 app.all("/*", (req, res, next) => {
   res.status(404).send({ msg: "Path not found" });
