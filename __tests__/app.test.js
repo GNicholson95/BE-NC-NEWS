@@ -5,6 +5,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require('../db/data/test-data/index')
 const endpoints = require('../endpoints.json');
+const comments = require('../db/data/test-data/comments');
 
 beforeEach(() => {
 	return seed(data);
@@ -335,3 +336,20 @@ it('should throw 404 error if username doesnt exist (PSQL err)', () => {
 })
 })
 
+describe('DELETE/api/comments/:comment_id', () => {
+  it('deletes comments by id', () => {
+    return request(app)
+    .delete('/api/comments/3')
+    .then((response)=>{
+      expect(response.status).toBe(204)
+    })
+  });
+  it('delete responds with a 400 err when given an invalid id', () => {
+    return request(app)
+    .delete('/api/comments/carrot')
+    .expect(400)
+    .then((response)=>{
+      expect(response.body.msg).toBe('Bad request')
+    })
+  });
+});
