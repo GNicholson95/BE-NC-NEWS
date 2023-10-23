@@ -137,6 +137,15 @@ describe('GET/api/articles', () => {
             });
       });
   });
+  
+  it('should throw 404 error if given id doesnt exist', () => {
+    return request(app)
+    .get('/api/articles/1000')
+    .expect(404)
+    .then((response) => {
+      expect(response.body.msg).toBe('Resource not found')
+  })
+  });
 
   it('filters the articles by the topic value specified in the query.', () => {
     return request(app)
@@ -228,35 +237,55 @@ describe('GET/api/articles/:article_id/comments', () => {
   });
 });
 
-
-describe('GET/api/users', () => {
-     it("get all users", () => {
-      return request(app).get("/api/users").then((response) => {
-              expect(response.body.users.length).toBe(4);
-           });
-       });
-  it('GET:200 and should respond with an users array all user objects', () => {
+describe('Patch /api/articles/:article_id', () => {
+  it('retuns a article with incremented votes', () => {
+    const newVote = { inc_votes: 1 }; 
     return request(app)
-      .get('/api/users')
-      .expect(200)
+      .patch('/api/articles/3')
+      .send(newVote)
+      .expect(201)
       .then((response) => {
-        const { users } = response.body;
-        users.forEach((user) => {
-          expect(typeof user.username).toBe('string');
-          expect(typeof user.name).toBe('string');
-          expect(typeof user.avatar_url).toBe('string');
-            });
+        expect(response.body).toHaveProperty('votes')
+        expect(response.body.votes).toBe(1)
       });
   });
 
-  it('should respond not found for invalid endpoint', () => {
-    return request(app).get('/invalid-endpoint')
-    .expect(404)
-    .then((response) => {
-        expect(response.body.msg).toBe('Path not found')
-    })
+  it('retuns a article with decremented votes', () => {
+    const newVote = { inc_votes: -100 }; 
+    return request(app)
+      .patch('/api/articles/3')
+      .send(newVote)
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toHaveProperty('votes')
+        expect(response.body.votes).toBe(-100)
+      });
+  });
+
+  it('responds with a 400 error for an invalid inc_votes value', () => {
+    const newVote = { inc_votes: 'carrot' };
+    return request(app)
+      .patch('/api/articles/3')
+      .send(newVote)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('Bad request');
+      });
+  });
+
+  it('responds with a 404 error for an invalid article_id', () => {
+    const newVote = { inc_votes: 1 };
+    return request(app)
+      .patch('/api/articles/100000')
+      .send(newVote)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('Resource not found');
+      });
+  });
+
 });
-});
+
 describe('POST /api/articles/:article_id/comments', () => {
 
   it('should return 201 and add a comment for an article.', () => {
@@ -334,7 +363,45 @@ it('should throw 404 error if username doesnt exist (PSQL err)', () => {
       expect(response.body.msg).toBe('Resource not found')
    })
 })
+it('should check exists but has no comments', () => {
+  return request(app)
+  .get('/api/articles/2/comments')
+  .expect(200)
+  .then((response) => {
+    const { comments } = response.body;
+    expect(comments).toEqual([])
 })
+});
+})
+
+describe('GET/api/users', () => {
+  it("get all users", () => {
+   return request(app).get("/api/users").then((response) => {
+           expect(response.body.users.length).toBe(4);
+        });
+    });
+it('GET:200 and should respond with an users array all user objects', () => {
+ return request(app)
+   .get('/api/users')
+   .expect(200)
+   .then((response) => {
+     const { users } = response.body;
+     users.forEach((user) => {
+       expect(typeof user.username).toBe('string');
+       expect(typeof user.name).toBe('string');
+       expect(typeof user.avatar_url).toBe('string');
+         });
+   });
+});
+
+it('should respond not found for invalid endpoint', () => {
+ return request(app).get('/invalid-endpoint')
+ .expect(404)
+ .then((response) => {
+     expect(response.body.msg).toBe('Path not found')
+ })
+});
+});
 
 describe('DELETE/api/comments/:comment_id', () => {
   it('deletes comments by id', () => {
@@ -352,44 +419,4 @@ describe('DELETE/api/comments/:comment_id', () => {
       expect(response.body.msg).toBe('Bad request')
     })
   });
-});
-
-describe('Patch /api/articles/:article_id', () => {
-  it('retuns a article with incremented votes', () => {
-    const newVote = { inc_votes: 1 }; 
-    return request(app)
-      .patch('/api/articles/3')
-      .send(newVote)
-      .expect(201)
-      .then((response) => {
-        console.log(response.body);
-        expect(response.body).toHaveProperty('votes')
-        expect(response.body.votes).toBe(1)
-      });
-  });
-
-  it('retuns a article with decremented votes', () => {
-    const newVote = { inc_votes: -100 }; 
-    return request(app)
-      .patch('/api/articles/3')
-      .send(newVote)
-      .expect(201)
-      .then((response) => {
-        console.log(response.body);
-        expect(response.body).toHaveProperty('votes')
-        expect(response.body.votes).toBe(-100)
-      });
-  });
-
-  it('responds with a 400 error for an invalid inc_votes value', () => {
-    const newVote = { inc_votes: 'carrot' };
-    return request(app)
-      .patch('/api/articles/3')
-      .send(newVote)
-      .expect(400)
-      .then((response) => {
-        expect(response.body.msg).toBe('Bad request');
-      });
-  });
-
 });
