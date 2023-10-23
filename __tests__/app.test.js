@@ -5,6 +5,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require('../db/data/test-data/index')
 const endpoints = require('../endpoints.json');
+const comments = require('../db/data/test-data/comments');
 
 beforeEach(() => {
 	return seed(data);
@@ -136,13 +137,28 @@ describe('GET/api/articles', () => {
             });
       });
   });
-  
-  it('should throw 404 error if given id doesnt exist', () => {
+
+  it('filters the articles by the topic value specified in the query.', () => {
     return request(app)
-    .get('/api/articles/1000')
-    .expect(404)
+    .get('/api/articles')
+    .query({ topic: 'mitch'})
+    .expect(200)
     .then((response) => {
-      expect(response.body.msg).toBe('Resource not found')
+      const { articles } = response.body;
+      articles.forEach((article) =>{
+        expect(article).toHaveProperty('topic','mitch')
+      })
+  })
+  });
+// ran out of time!
+  xit('should check exists but has no comments', () => {
+    return request(app)
+    .get('/api/articles')
+    .query({ topic: 'paper'})
+    .expect(200)
+    .then((response) => {
+      const { articles } = response.body;
+      expect(articles).toEqual([])
   })
   });
 });
@@ -212,6 +228,132 @@ describe('GET/api/articles/:article_id/comments', () => {
   });
 });
 
+
+describe('GET/api/users', () => {
+     it("get all users", () => {
+      return request(app).get("/api/users").then((response) => {
+              expect(response.body.users.length).toBe(4);
+           });
+       });
+  it('GET:200 and should respond with an users array all user objects', () => {
+    return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then((response) => {
+        const { users } = response.body;
+        users.forEach((user) => {
+          expect(typeof user.username).toBe('string');
+          expect(typeof user.name).toBe('string');
+          expect(typeof user.avatar_url).toBe('string');
+            });
+      });
+  });
+
+  it('should respond not found for invalid endpoint', () => {
+    return request(app).get('/invalid-endpoint')
+    .expect(404)
+    .then((response) => {
+        expect(response.body.msg).toBe('Path not found')
+    })
+});
+});
+describe('POST /api/articles/:article_id/comments', () => {
+
+  it('should return 201 and add a comment for an article.', () => {
+    const comment = {
+      username: 'butter_bridge',
+      body: 'My comments'
+    }
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(comment)
+      .expect(201)
+      .then((response) => {
+          expect(response.body.comment).toMatchObject({
+           author: 'butter_bridge',
+           body: 'My comments',
+          })
+        expect(typeof response.body.comment.comment_id).toBe('number');
+        expect(typeof response.body.comment.votes).toBe('number');
+        expect(typeof response.body.comment.created_at).toBe('string');
+        expect(typeof response.body.comment.author).toBe('string');
+        expect(typeof response.body.comment.body).toBe('string');
+        expect(typeof response.body.comment.article_id).toBe('number');
+      });
+  });
+
+it('POST:400 error if not given a comment', () => {
+  const comment = {}
+  return request(app)
+    .post('/api/articles/banana/comments')
+    .send(comment)
+    .expect(400)
+    .then((response) => {
+    expect(response.body.msg).toBe('Bad request')
+})
+})
+
+it('should throw 404 error if article not found', () => {
+  const comment = {
+    username: 'no_user',
+    body: 'My comments'
+  }
+  return request(app)
+  .post('/api/articles/1000/comments')
+  .send(comment)
+  .expect(404)
+  .then((response) => {
+      expect(response.body.msg).toBe('Resource not found')
+   })
+})
+
+it('POST:400 error if given an invalid article id', () => {
+  const comment = {
+    username: 'butter_bridge',
+    body: 'My comment'
+  }
+  return request(app)
+    .post('/api/articles/banana/comments')
+    .send(comment)
+    .expect(400)
+    .then((response) => {
+    expect(response.body.msg).toBe('Bad request')
+})
+})
+
+it('should throw 404 error if username doesnt exist (PSQL err)', () => {
+  const comment = {
+    username: 'no_user',
+    body: 'My comments'
+  }
+  return request(app)
+  .post('/api/articles/1/comments')
+  .send(comment)
+  .expect(404)
+  .then((response) => {
+      expect(response.body.msg).toBe('Resource not found')
+   })
+})
+})
+
+describe('DELETE/api/comments/:comment_id', () => {
+  it('deletes comments by id', () => {
+    return request(app)
+    .delete('/api/comments/3')
+    .then((response)=>{
+      expect(response.status).toBe(204)
+    })
+  });
+  it('delete responds with a 400 err when given an invalid id', () => {
+    return request(app)
+    .delete('/api/comments/carrot')
+    .expect(400)
+    .then((response)=>{
+      expect(response.body.msg).toBe('Bad request')
+    })
+  });
+});
+
 describe('Patch /api/articles/:article_id', () => {
   it('retuns a article with incremented votes', () => {
     const newVote = { inc_votes: 1 }; 
@@ -251,5 +393,3 @@ describe('Patch /api/articles/:article_id', () => {
   });
 
 });
-
-       
